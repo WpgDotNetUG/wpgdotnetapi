@@ -1,0 +1,10 @@
+{
+  "name": "Winnipeg Dot Net User Group API",
+  "description": "Api to server the Wpg Dot Net UG website",
+  "website": "http://winnipegdotnet.org/",
+  "repository": "https://github.com/wpgdotnetug/wpgdotnetapi",
+  "logo": "https://raw.githubusercontent.com/SuaveIO/suave/gh-pages/images/logo.gif",
+  "env": {
+    "BUILDPACK_URL": "https://github.com/SuaveIO/mono-script-buildpack.git"
+  }
+}

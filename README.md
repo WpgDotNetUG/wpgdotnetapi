@@ -6,3 +6,5 @@ You can deploy this to Heroku by following the instructions on [Suave](http://su
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
+The API is deployed to [our Heroku instance](https://wpgdotnetapi.herokuapp.com)
+

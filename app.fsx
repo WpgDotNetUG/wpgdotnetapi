@@ -10,6 +10,7 @@ Paket.Dependencies.Install (System.IO.File.ReadAllText "paket.dependencies")
 #I "packages/Suave/lib/net40"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+#load "eventbrite.fsx"
 
 open System
 open Suave                 // always open suave
@@ -20,6 +21,7 @@ open Suave.Web             // for config
 open System.Net
 open Suave.Operators 
 open FSharp.Data
+open Eventbrite
 
 printfn "initializing script..."
 
@@ -58,7 +60,6 @@ let homePage =
 
 printfn "starting web server..."
 
-
 type SponsorsJson = JsonProvider<""" { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """, RootName="Root">
 
 let sponsorsText = SponsorsJson.Root(
@@ -81,7 +82,6 @@ let boardText =
   {"name": "Amir Barylko", "role": "President"}
 ]}""" 
 
-
 let jsonMime = Writers.setMimeType "application/json"
 
 let app = 
@@ -90,6 +90,7 @@ let app =
                 [ path "/" >=> OK homePage
                   path "/api/sponsors" >=> jsonMime >=> OK sponsorsText
                   path "/api/board" >=> jsonMime >=> OK boardText 
+                  path "/api/events" >=> jsonMime >=> Eventbrite.getEvents
                   path "/goodbye" >=> OK "Good bye GET" ]]
     
 

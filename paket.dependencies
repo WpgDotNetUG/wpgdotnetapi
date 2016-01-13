@@ -3,3 +3,4 @@ source https://nuget.org/api/v2
 nuget Fake
 nuget Suave
 nuget FSharp.Data
+nuget FSharp.Compiler.Service

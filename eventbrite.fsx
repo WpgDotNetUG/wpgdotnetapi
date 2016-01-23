@@ -8,13 +8,15 @@ module Eventbrite =
     open Suave.Successful
     open FSharp.Data
 
-    type EventsJson = JsonProvider<""" { "events" : [{"title":"talk title", "date":"2011-01-01T17:00:00", 
-                                                  "id" : "use as string",  
+    let [<Literal>] eventsSample = """ { "events" : [{"title":"talk title", "date":"2011-01-01T17:00:00",
+                                                  "id" : "use as string",
                                                   "description" : "string",
                                                   "enddate" : "2011-01-01T17:30:00",
                                                   "status" : "string",
                                                   "logo" : "url string",
-                                                  "venue" : {"name":"string", "address":"123 mean st.", "id":"use as string"}}]} """, RootName="Root">
+                                                  "venue" : {"name":"string", "address":"123 mean st.", "id":"use as string"}}]} """
+
+    type EventsJson = JsonProvider<eventsSample, RootName="Root">
 
     type EbEventsJson = JsonProvider<""" {"pagination": {"object_count": 32, "page_number": 1, "page_size": 50, "page_count": 1}, 
                                                 "events": [{"name": {"text": "T vs B", "html": "T vs B"}, 

@@ -39,7 +39,8 @@ let homePage =
 
 printfn "starting web server..."
 
-type SponsorsJson = JsonProvider<""" { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """, RootName="Root">
+let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
+type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
 let sponsorsText = SponsorsJson.Root(
                         sponsors=[|
@@ -52,14 +53,16 @@ let sponsorsText = SponsorsJson.Root(
                         |]
                    ).JsonValue.ToString()
                    
+let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role"}] } """
+type BoardJson = JsonProvider<boardSample, RootName="Root">
 
-let boardText = 
-    """
-{"board": [
-  {"name": "Roy Drenker" , "role": "Treasurer"},
-  {"name": "David Wesst" , "role": "Master of social media"},
-  {"name": "Amir Barylko", "role": "President"}
-]}""" 
+let boardText = BoardJson.Root(
+                     board=[|
+                       BoardJson.Board(name="Roy Drenker", role="Treasurer")
+                       BoardJson.Board(name="David Wesst", role="Master of social media")
+                       BoardJson.Board(name="Amir Barylko", role="President")
+                     |]
+                ).JsonValue.ToString()
 
 let jsonMime = Writers.setMimeType "application/json"
 
@@ -68,7 +71,10 @@ let app =
     [ GET >=> choose
                 [ path "/" >=> OK homePage
                   path "/api/sponsors" >=> jsonMime >=> OK sponsorsText
+                  path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
                   path "/api/board" >=> jsonMime >=> OK boardText 
+                  path "/api/board/sample" >=> jsonMime >=> OK boardSample
                   path "/api/events" >=> jsonMime >=> Eventbrite.getEvents
+                  path "/api/events/sample" >=> jsonMime >=> OK Eventbrite.eventsSample
                   path "/goodbye" >=> OK "Good bye GET" ]]
     

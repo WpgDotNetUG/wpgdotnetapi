@@ -76,5 +76,5 @@ let app =
                   path "/api/board/sample" >=> jsonMime >=> OK boardSample
                   path "/api/events" >=> jsonMime >=> Eventbrite.getEvents
                   path "/api/events/sample" >=> jsonMime >=> OK Eventbrite.eventsSample
-                  path "/goodbye" >=> OK "Good bye GET" ]]
-    
+                  path "/goodbye" >=> OK "Good bye GET"
+                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]]

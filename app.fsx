@@ -43,17 +43,23 @@ printfn "starting web server..."
 let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
 type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
-let sponsorsText = SponsorsJson.Root(
-                        sponsors=[|
-                          SponsorsJson.Sponsor(name="Apptius"  , imgUrl="http://images.winnipegdotnet.org/apptius.png", url="http://apptius.com") 
-                          SponsorsJson.Sponsor(name="Imaginet" , imgUrl="http://images.winnipegdotnet.org/imaginet.png", url="http://imaginet.com") 
-                          SponsorsJson.Sponsor(name="iQmetrix" , imgUrl="http://images.winnipegdotnet.org/iqmetrix.png", url="http://www.iqmetrix.com") 
-                          SponsorsJson.Sponsor(name="Microsoft", imgUrl="http://images.winnipegdotnet.org/microsoft.png", url="http://blogs.msdn.com/b/cdndevs/")
-                          SponsorsJson.Sponsor(name="Ineta"    , imgUrl="http://images.winnipegdotnet.org/ineta.png", url="http://www.ineta.org/")
-                          SponsorsJson.Sponsor(name="JetBrains", imgUrl="http://images.winnipegdotnet.org/jetbrains.png", url="http://www.jetbrains.com") 
-                        |]
-                   ).JsonValue.ToString()
-                   
+let sponsorsText = 
+  let imgPath = (+) "http://winnipegdotnet.org/Images/"
+  let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath l, url=u)
+  let sponsors =
+    [
+      ("Apptius"  , "Apptius-Logo.png", "http://apptius.com") 
+      ("Imaginet" , "imaginet.png"    , "http://imaginet.com") 
+      ("iQmetrix" , "iqmetrix-logo.png", "http://www.iqmetrix.com") 
+      ("Vision Critical", "vc_logo.png", "http://www.visioncritical.com/")
+      ("Microsoft", "MSFT.png", "http://blogs.msdn.com/b/cdndevs/")
+      ("JetBrains", "jetbrains_logo.png", "http://www.jetbrains.com")
+    ]
+    |> List.map mkSponsor
+    |> Array.ofList
+
+  SponsorsJson.Root( sponsors=sponsors).JsonValue.ToString()
+
 let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role"}] } """
 type BoardJson = JsonProvider<boardSample, RootName="Root">
 

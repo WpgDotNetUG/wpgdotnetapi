@@ -13,6 +13,7 @@ open Suave.Successful // for OK-result
 open Suave.Web             // for config
 open System.Net
 open Suave.Operators 
+open Suave.Writers 
 open FSharp.Data
 open Eventbrite
 
@@ -64,17 +65,17 @@ let boardText = BoardJson.Root(
                      |]
                 ).JsonValue.ToString()
 
-let jsonMime = Writers.setMimeType "application/json"
+let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
 let app = 
   choose
     [ GET >=> choose
                 [ path "/" >=> OK homePage
-                  path "/api/sponsors" >=> jsonMime >=> OK sponsorsText
+                  path "/api/sponsors"        >=> jsonMime >=> OK sponsorsText
                   path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
-                  path "/api/board" >=> jsonMime >=> OK boardText 
-                  path "/api/board/sample" >=> jsonMime >=> OK boardSample
-                  path "/api/events" >=> jsonMime >=> Eventbrite.getEvents
-                  path "/api/events/sample" >=> jsonMime >=> OK Eventbrite.eventsSample
+                  path "/api/board"           >=> jsonMime >=> OK boardText 
+                  path "/api/board/sample"    >=> jsonMime >=> OK boardSample
+                  path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
+                  path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
                   path "/goodbye" >=> OK "Good bye GET" ]]
     

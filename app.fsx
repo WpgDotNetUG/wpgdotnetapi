@@ -60,16 +60,21 @@ let sponsorsText =
 
   SponsorsJson.Root( sponsors=sponsors).JsonValue.ToString()
 
-let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role"}] } """
+let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role", "imgUrl":"http://someimage.com", "contact": "Inquiries"}] } """
 type BoardJson = JsonProvider<boardSample, RootName="Root">
 
-let boardText = BoardJson.Root(
-                     board=[|
-                       BoardJson.Board(name="Roy Drenker", role="Treasurer")
-                       BoardJson.Board(name="David Wesst", role="Master of social media")
-                       BoardJson.Board(name="Amir Barylko", role="President")
-                     |]
-                ).JsonValue.ToString()
+let boardText =
+  let imgPath = (+) "http://winnipegdotnet.org/content/contactus/"
+  let mkMember (n, r, i, c) = BoardJson.Board(name=n, role=r, imgUrl=imgPath i, contact=c)
+  let members = 
+    [|
+      ("Amir Barylko", "President"     , "amir.jpg" , "General Inquiries")
+      ("Roy Drenker" , "Treasurer"     , "roy.jpg"  , "Sponsorship")
+      ("David Wesst" , "Event Planning", "david.jpg", "Events")
+    |]
+    |> Array.map mkMember
+
+  BoardJson.Root(board=members).JsonValue.ToString()
 
 let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 

@@ -3,7 +3,9 @@
 #I "packages/Suave/lib/net40"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+
 #load "eventbrite.fsx"
+#load "youtube.fsx"
 
 open System
 open Suave                 // always open suave
@@ -16,6 +18,7 @@ open Suave.Operators
 open Suave.Writers 
 open FSharp.Data
 open Eventbrite
+open Youtube
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -88,5 +91,6 @@ let app =
                   path "/api/board/sample"    >=> jsonMime >=> OK boardSample
                   path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
                   path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
+                  path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
                   path "/goodbye" >=> OK "Good bye GET" ]]
     

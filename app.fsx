@@ -3,7 +3,9 @@
 #I "packages/Suave/lib/net40"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+
 #load "eventbrite.fsx"
+#load "youtube.fsx"
 
 open System
 open Suave                 // always open suave
@@ -13,8 +15,10 @@ open Suave.Successful // for OK-result
 open Suave.Web             // for config
 open System.Net
 open Suave.Operators 
+open Suave.Writers 
 open FSharp.Data
 open Eventbrite
+open Youtube
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -42,39 +46,51 @@ printfn "starting web server..."
 let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
 type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
-let sponsorsText = SponsorsJson.Root(
-                        sponsors=[|
-                          SponsorsJson.Sponsor(name="Apptius"  , imgUrl="http://images.winnipegdotnet.org/apptius.png", url="http://apptius.com") 
-                          SponsorsJson.Sponsor(name="Imaginet" , imgUrl="http://images.winnipegdotnet.org/imaginet.png", url="http://imaginet.com") 
-                          SponsorsJson.Sponsor(name="iQmetrix" , imgUrl="http://images.winnipegdotnet.org/iqmetrix.png", url="http://www.iqmetrix.com") 
-                          SponsorsJson.Sponsor(name="Microsoft", imgUrl="http://images.winnipegdotnet.org/microsoft.png", url="http://blogs.msdn.com/b/cdndevs/")
-                          SponsorsJson.Sponsor(name="Ineta"    , imgUrl="http://images.winnipegdotnet.org/ineta.png", url="http://www.ineta.org/")
-                          SponsorsJson.Sponsor(name="JetBrains", imgUrl="http://images.winnipegdotnet.org/jetbrains.png", url="http://www.jetbrains.com") 
-                        |]
-                   ).JsonValue.ToString()
-                   
-let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role"}] } """
+let sponsorsText = 
+  let imgPath = (+) "http://winnipegdotnet.org/Images/"
+  let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath l, url=u)
+  let sponsors =
+    [
+      ("Apptius"  , "Apptius-Logo.png", "http://apptius.com") 
+      ("Imaginet" , "imaginet.png"    , "http://imaginet.com") 
+      ("iQmetrix" , "iqmetrix-logo.png", "http://www.iqmetrix.com") 
+      ("Vision Critical", "vc_logo.png", "http://www.visioncritical.com/")
+      ("Microsoft", "MSFT.png", "http://blogs.msdn.com/b/cdndevs/")
+      ("JetBrains", "jetbrains_logo.png", "http://www.jetbrains.com")
+    ]
+    |> List.map mkSponsor
+    |> Array.ofList
+
+  SponsorsJson.Root( sponsors=sponsors).JsonValue.ToString()
+
+let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role", "imgUrl":"http://someimage.com", "contact": "Inquiries"}] } """
 type BoardJson = JsonProvider<boardSample, RootName="Root">
 
-let boardText = BoardJson.Root(
-                     board=[|
-                       BoardJson.Board(name="Roy Drenker", role="Treasurer")
-                       BoardJson.Board(name="David Wesst", role="Master of social media")
-                       BoardJson.Board(name="Amir Barylko", role="President")
-                     |]
-                ).JsonValue.ToString()
+let boardText =
+  let imgPath = (+) "http://winnipegdotnet.org/content/contactus/"
+  let mkMember (n, r, i, c) = BoardJson.Board(name=n, role=r, imgUrl=imgPath i, contact=c)
+  let members = 
+    [|
+      ("Amir Barylko", "President"     , "amir.jpg" , "General Inquiries")
+      ("Roy Drenker" , "Treasurer"     , "roy.jpg"  , "Sponsorship")
+      ("David Wesst" , "Event Planning", "david.jpg", "Events")
+    |]
+    |> Array.map mkMember
 
-let jsonMime = Writers.setMimeType "application/json"
+  BoardJson.Root(board=members).JsonValue.ToString()
+
+let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
 let app = 
   choose
     [ GET >=> choose
                 [ path "/" >=> OK homePage
-                  path "/api/sponsors" >=> jsonMime >=> OK sponsorsText
+                  path "/api/sponsors"        >=> jsonMime >=> OK sponsorsText
                   path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
-                  path "/api/board" >=> jsonMime >=> OK boardText 
-                  path "/api/board/sample" >=> jsonMime >=> OK boardSample
-                  path "/api/events" >=> jsonMime >=> Eventbrite.getEvents
-                  path "/api/events/sample" >=> jsonMime >=> OK Eventbrite.eventsSample
-                  path "/goodbye" >=> OK "Good bye GET"
-                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]]
+                  path "/api/board"           >=> jsonMime >=> OK boardText 
+                  path "/api/board/sample"    >=> jsonMime >=> OK boardSample
+                  path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
+                  path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
+                  path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
+                  path "/goodbye" >=> OK "Good bye GET" 
+                  RequestErrors.NOT_FOUND "Resource not found." ]]

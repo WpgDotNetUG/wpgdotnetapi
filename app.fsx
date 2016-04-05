@@ -6,6 +6,7 @@
 
 #load "eventbrite.fsx"
 #load "youtube.fsx"
+#load "twitter.fsx"
 
 open System
 open Suave                 // always open suave
@@ -19,6 +20,7 @@ open Suave.Writers
 open FSharp.Data
 open Eventbrite
 open Youtube
+open Twitter
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -92,5 +94,6 @@ let app =
                   path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
                   path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
                   path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
+                  path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" ]]
     

@@ -6,14 +6,16 @@ NUGET
     FSharp.Control.AsyncSeq (2.0.3)
     FSharp.Core (4.0.0.1)
     FSharp.Data (2.2.5)
-      Zlib.Portable (>= 1.10.0) - framework: portable-net40+sl50+wp80+win80
-    FSharpx.Async (1.12.0)
+      Zlib.Portable (>= 1.10) - framework: portable-net40+sl50+wp80+win80
+    FSharp.Data.Toolbox.Twitter (0.13)
+      FSharp.Data (>= 2.2.3)
+    FSharpx.Async (1.12)
       FSharp.Control.AsyncSeq
-    FSharpx.Collections (1.14.0)
-      FSharp.Core (>= 3.0.0)
+    FSharpx.Collections (1.14)
+      FSharp.Core (>= 3.0)
     FSharpx.Extras (1.10.3)
       FSharpx.Async (>= 1.12)
       FSharpx.Collections (>= 1.10.1)
-    Suave (1.0.0)
+    Suave (1.0)
       FSharp.Core (>= 3.1.2.5)
-    Zlib.Portable (1.11.0) - framework: portable-net40+sl50+wp80+win80
+    Zlib.Portable (1.11) - framework: portable-net40+sl50+wp80+win80

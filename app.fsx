@@ -8,6 +8,7 @@
 #load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"
+#load "slack.fsx"
 
 open System
 open Suave                 // always open suave
@@ -100,7 +101,7 @@ let app =
                   path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
                   path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" 
-                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]]
+                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."
                 ]
       POST >=> choose 
                 [ path "/api/slack"           >=> jsonMime >=> warbler(fun context -> 

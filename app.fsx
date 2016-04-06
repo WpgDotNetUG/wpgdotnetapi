@@ -3,6 +3,7 @@
 #I "packages/Suave/lib/net40"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+#r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 #load "eventbrite.fsx"
 #load "youtube.fsx"
@@ -21,6 +22,7 @@ open FSharp.Data
 open Eventbrite
 open Youtube
 open Twitter
+open Slack
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -83,13 +85,15 @@ let boardText =
 
 let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
-let app = 
+
+
+let app =
   choose
     [ GET >=> choose
                 [ path "/" >=> OK homePage
                   path "/api/sponsors"        >=> jsonMime >=> OK sponsorsText
                   path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
-                  path "/api/board"           >=> jsonMime >=> OK boardText 
+                  path "/api/board"           >=> jsonMime >=> OK boardText
                   path "/api/board/sample"    >=> jsonMime >=> OK boardSample
                   path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
                   path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
@@ -97,3 +101,9 @@ let app =
                   path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" 
                   Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]]
+                ]
+      POST >=> choose 
+                [ path "/api/slack"           >=> jsonMime >=> warbler(fun context -> 
+                                                    OK (Slack.signUp (context.request.formData "email")))
+                ]
+    ]

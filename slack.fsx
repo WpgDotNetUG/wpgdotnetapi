@@ -7,12 +7,18 @@ open FSharp.Data
 open Suave
 open Suave.Successful // for OK-result
 open Suave.Http 
+open FSharpx.Nullable
+
+let inline (|??) a b = match a with 
+                        | null -> b
+                        | _ -> a
+
 
 module Slack = 
     let invite ctx email   =
         async {
-            let org =   Environment.GetEnvironmentVariable("SlackOrg")
-            let token =  Environment.GetEnvironmentVariable("SlackToken")
+            let org = (Environment.GetEnvironmentVariable("SLACK_ORG")) |?? "wpgdotnet" // don't die if environment variable not set
+            let token =  Environment.GetEnvironmentVariable("SLACK_TOKEN") 
             let url = sprintf "https://%s.slack.com/api/users.admin.invite?token=%s" org token
             let! html = Http.AsyncRequestString(url, body = FormValues ["email", email])
             return! OK (html) ctx

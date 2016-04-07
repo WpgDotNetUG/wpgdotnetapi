@@ -3,20 +3,16 @@
 #I "packages/Suave/lib/net40"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
-#r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 #load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"
 #load "slack.fsx"
 
-open System
 open Suave                 // always open suave
 open Suave.Http
 open Suave.Filters
 open Suave.Successful // for OK-result
-open Suave.Web             // for config
-open System.Net
 open Suave.Operators 
 open Suave.Writers 
 open FSharp.Data
@@ -101,10 +97,6 @@ let app =
                   path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
                   path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" 
-                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."
-                ]
-      POST >=> choose 
-                [ path "/api/slack"           >=> jsonMime >=> warbler(fun context -> 
-                                                    OK (Slack.signUp (context.request.formData "email")))
-                ]
-    ]
+                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]
+
+      POST >=> path "/api/slack"              >=> jsonMime >=> Slack.signUp ]

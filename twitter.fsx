@@ -21,20 +21,29 @@ module Twitter =
     {
       "tweets": [
         { 
-          "text": "some kind"
+          "text": "some kind",
+          "entity" :  {
+            "hashtags" : [],
+            "urls" : [],
+            "user_mentions": []
+          }
         }
       ]
     }
     """
 
   type TwitterData = JsonProvider<twitterSample>
+  type EntityData = TwitterData.Entity
+
+  let mapEntity e = TwitterData.Entity([||], [||], [||])
 
   let getTweets ctxt =
     async {
       let twitter = Twitter.AuthenticateAppOnly(key, secret)
       let home = twitter.Timelines.Timeline("wpgnetug", 10)
 
-      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Text))
+      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Text, mapEntity t.Entities))
+
 
       return! OK (TwitterData.Root(tweets).JsonValue.ToString()) ctxt
     }

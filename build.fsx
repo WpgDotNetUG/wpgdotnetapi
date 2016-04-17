@@ -63,27 +63,14 @@ let reloadScript () =
 
 let currentApp = ref (fun _ -> async { return None })
 
-let [<Literal>] exceptionSample = """ { "message":"friendly error" } """
-type exceptionJson = JsonProvider<exceptionSample, RootName="Root">
 
 let customErrorHandler (ex : Exception) msg (ctx : HttpContext) =
-    match ex with 
-    | InternalException ie -> 
-        let internalErrText = exceptionJson.Root(message=ie).JsonValue.ToString()
-        if ctx.isLocal then
-            Response.response HTTP_500 (Encoding.UTF8.GetBytes (sprintf "<h1>%s: %s</h1><br/>%A" (ex.GetType().ToString()) ex.Message ex)) ctx
-        else 
-            Response.response HTTP_500 (Encoding.UTF8.GetBytes (internalErrText)) ctx
-    |_ -> 
-        ctx.runtime.logger.Log LogLevel.Error (fun _ ->
-          LogLine.mk "Suave.Web.defaultErrorHandler" LogLevel.Error
-                     ctx.request.trace (Some ex)
-                     msg)
-        if ctx.isLocal then
-          Response.response HTTP_500 (Encoding.UTF8.GetBytes (sprintf "<h1>%s: %s</h1><br/>%A" (ex.GetType().ToString()) ex.Message ex)) ctx
-        else 
-            Response.response HTTP_500 (Encoding.UTF8.GetBytes HTTP_500.message) ctx
-
+    ctx.runtime.logger.Log LogLevel.Error (fun _ ->
+            LogLine.mk "Suave.Web.defaultErrorHandler" LogLevel.Error
+                        ctx.request.trace (Some ex)
+                        msg)
+    wpgdotnet.INTERNAL_ERROR ex ctx 
+            
 let serverConfig =
   { defaultConfig with
       homeFolder = Some __SOURCE_DIRECTORY__

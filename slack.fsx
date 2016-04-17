@@ -17,15 +17,20 @@ let inline (|??) a b = match a with
 
 module Slack = 
     let INTERNAL_ERROR ctx = 
-        raise (InternalException "Internal Error")
+        raise (wpgdotnet.InternalException "Internal Error")
 
+    type SlackMessage = JsonProvider<""" { "ok":"false", "error":"not authorized" } """>
     let invite ctx email   =
         async {
             let org = (Environment.GetEnvironmentVariable("SLACK_ORG")) |?? "wpgdotnet" // don't die if environment variable not set
             let token =  Environment.GetEnvironmentVariable("SLACK_TOKEN") 
             let url = sprintf "https://%s.slack.com/api/users.admin.invite?token=%s" org token
-            let! html = Http.AsyncRequestString(url, body = FormValues ["email", email])
-            return! OK (html) ctx
+            let! apiResponse = Http.AsyncRequestString(url, body = FormValues ["email", email])
+
+            let slackResponse = SlackMessage.Parse(apiResponse)
+            if not slackResponse.Ok  then
+                INTERNAL_ERROR (slackResponse.Error) ctx
+            return! OK (apiResponse) ctx
         }
 
     let signUp (ctx:HttpContext) = 

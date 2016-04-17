@@ -19,31 +19,63 @@ module Twitter =
 
   let [<Literal>] twitterSample = """
     {
-      "tweets": [
-        { 
+      "tweets": [ {
+          "user": {
+              "id": "some_id",
+              "url": "http://some-cool-site.com",
+              "screen_name": "some name",
+              "profile_image_url": "http://some-cool-site.com/someones-face.jpg"
+          },
+          "created_at": "Tue Oct 30 13:22:33 +0000 2012",
           "text": "some kind",
-          "entity" :  {
-            "hashtags" : [],
-            "urls" : [],
-            "user_mentions": []
-          }
-        }
-      ]
-    }
+          "entity": {
+              "hashtags": [ {
+                  "text": "poignanttag",
+                  "indices": [10, 20] } ],
+              "urls": [ {
+                  "url": "http://t.co/funUrl",
+                  "expanded_url": "http://www.actual-domain.com/?some=query&stuff=123",
+                  "display_url": "actual-domain.com/?some=…",
+                  "indices": [10, 20] } ],
+              "user_mentions": [ {
+                  "screen_name": "wpgnetug",
+                  "name": "Winnipeg Dotnet",
+                  "id_str": "some_id",
+                  "indices": [10, 20] } ] }
+       } ]
+     }
     """
 
   type TwitterData = JsonProvider<twitterSample>
-  type EntityData = TwitterData.Entity
+  type EntityData  = TwitterData.Entity
+  type UserData    = TwitterData.User
+  type HashtagData = TwitterData.Hashtag
+  type UrlData     = TwitterData.Url
+  type MentionData = TwitterData.UserMention
+  
+  type Mention     = TwitterTypes.TimeLine.UserMention
+  type Entity      = TwitterTypes.TimeLine.Entities4
+  type User        = TwitterTypes.TimeLine.User
 
-  let mapEntity e = TwitterData.Entity([||], [||], [||])
+  let mapUser (u:User) =
+    UserData(
+        u.Id.ToString(),
+        u.ScreenName,
+        u.Url.Value,
+        u.ProfileImageUrl )
+
+  let mapEntity (e:Entity) =
+    EntityData(
+        e.Hashtags      |> Array.map (fun h -> HashtagData (h.Text, h.Indices)),
+        e.Urls          |> Array.map (fun u -> UrlData     (u.Url, u.ExpandedUrl, u.DisplayUrl, u.Indices)),
+        e.UserMentions  |> Array.map (fun m -> MentionData (m.ScreenName, m.Name, m.Id.ToString(), m.Indices)) )
 
   let getTweets ctxt =
     async {
       let twitter = Twitter.AuthenticateAppOnly(key, secret)
       let home = twitter.Timelines.Timeline("wpgnetug", 10)
 
-      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Text, mapEntity t.Entities))
-
+      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(mapUser t.User, t.CreatedAt, t.Text, mapEntity t.Entities))
 
       return! OK (TwitterData.Root(tweets).JsonValue.ToString()) ctxt
     }

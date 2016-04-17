@@ -9,8 +9,12 @@
 #load "twitter.fsx"
 #load "slack.fsx"
 
+open System
+open System.Text
 open Suave                 // always open suave
-open Suave.Http
+open Suave.Utils
+
+open Suave.Http 
 open Suave.Filters
 open Suave.Successful // for OK-result
 open Suave.Operators 
@@ -20,6 +24,7 @@ open Eventbrite
 open Youtube
 open Twitter
 open Slack
+
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -82,8 +87,6 @@ let boardText =
 
 let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
-
-
 let app =
   choose
     [ GET >=> choose
@@ -100,3 +103,4 @@ let app =
                   Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]
 
       POST >=> path "/api/slack"              >=> jsonMime >=> Slack.signUp ]
+    

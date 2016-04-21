@@ -7,21 +7,13 @@
 #r "packages/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FAKE/tools/FakeLib.dll"
-#r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
-
-#load "wpgdotnet.fsx"
-
 open Fake
 
 open System
-open System.Text
 open System.IO
 open Suave
 open Suave.Web
-open Suave.Logging
 open Microsoft.FSharp.Compiler.Interactive.Shell
-open FSharp.Data
-open wpgdotnet
 
 // --------------------------------------------------------------------------------------
 // The following uses FileSystemWatcher to look for changes in 'app.fsx'. When
@@ -63,18 +55,9 @@ let reloadScript () =
 
 let currentApp = ref (fun _ -> async { return None })
 
-
-let customErrorHandler (ex : Exception) msg (ctx : HttpContext) =
-    ctx.runtime.logger.Log LogLevel.Error (fun _ ->
-            LogLine.mk "Suave.Web.defaultErrorHandler" LogLevel.Error
-                        ctx.request.trace (Some ex)
-                        msg)
-    wpgdotnet.INTERNAL_ERROR ex ctx 
-            
 let serverConfig =
   { defaultConfig with
       homeFolder = Some __SOURCE_DIRECTORY__
-      errorHandler = customErrorHandler
       logger = Logging.Loggers.saneDefaultsFor Logging.LogLevel.Debug
       bindings = [ HttpBinding.mk HTTP  (Net.IPAddress.Parse("127.0.0.1")) 8083us] }
 

@@ -7,20 +7,24 @@
 #load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"
+#load "slack.fsx"
 
 open System
+open System.Text
 open Suave                 // always open suave
-open Suave.Http
+open Suave.Utils
+
+open Suave.Http 
 open Suave.Filters
 open Suave.Successful // for OK-result
-open Suave.Web             // for config
-open System.Net
 open Suave.Operators 
 open Suave.Writers 
 open FSharp.Data
 open Eventbrite
 open Youtube
 open Twitter
+open Slack
+
 
 let angularHeader = """<head>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -83,17 +87,20 @@ let boardText =
 
 let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
-let app = 
+let app =
   choose
     [ GET >=> choose
                 [ path "/" >=> OK homePage
                   path "/api/sponsors"        >=> jsonMime >=> OK sponsorsText
                   path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
-                  path "/api/board"           >=> jsonMime >=> OK boardText 
+                  path "/api/board"           >=> jsonMime >=> OK boardText
                   path "/api/board/sample"    >=> jsonMime >=> OK boardSample
                   path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
                   path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
                   path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
                   path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" 
-                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]]
+                  Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]
+
+      POST >=> path "/api/slack"              >=> jsonMime >=> Slack.signUp ]
+    

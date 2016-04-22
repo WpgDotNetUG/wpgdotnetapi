@@ -27,8 +27,8 @@ module Slack =
         async {
             let org = (Environment.GetEnvironmentVariable("SLACK_ORG")) |?? "wpgdotnet" // don't die if environment variable not set
             let token =  Environment.GetEnvironmentVariable("SLACK_TOKEN") 
-            let url = sprintf "https://%s.slack.com/api/users.admin.invite?token=%s" org token
-            let! apiResponse = Http.AsyncRequestString(url, body = FormValues ["email", email])
+            let url = sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org (DateTime.Now.ToString("yyyyMMddhhmmss"))
+            let! apiResponse = Http.AsyncRequestString(url, body = FormValues ["email", email; "token", token])
             let slackResponse = SlackMessage.Parse(apiResponse)
             match slackResponse.Ok with 
             | false -> return! (asyncError ctx slackResponse.Error)

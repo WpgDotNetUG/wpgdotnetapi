@@ -52,9 +52,10 @@ printfn "starting web server..."
 let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
 type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
+let imgPath = sprintf "https://s3.amazonaws.com/dotnetug/images/%s/%s"
+
 let sponsorsText = 
-  let imgPath = (+) "http://winnipegdotnet.org/Images/"
-  let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath l, url=u)
+  let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath "sponsors" l, url=u)
   let sponsors =
     [
       ("Apptius"  , "Apptius-Logo.png", "http://apptius.com") 
@@ -73,8 +74,7 @@ let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Import
 type BoardJson = JsonProvider<boardSample, RootName="Root">
 
 let boardText =
-  let imgPath = (+) "http://winnipegdotnet.org/content/contactus/"
-  let mkMember (n, r, i, c) = BoardJson.Board(name=n, role=r, imgUrl=imgPath i, contact=c)
+  let mkMember (n, r, i, c) = BoardJson.Board(name=n, role=r, imgUrl=imgPath "board" i, contact=c)
   let members = 
     [|
       ("Amir Barylko", "President"     , "amir.jpg" , "General Inquiries")

@@ -11,7 +11,12 @@ module Eventbrite =
     open FSharp.Data
 
     let [<Literal>] eventsSample = """
-      { "events" : [
+      { 
+        "config" : {
+          "isWinter": false, 
+          "isSummer": false
+        },
+        "events" : [
         { "title":"talk title", 
           "date":"2011-01-01T17:00:00",
           "id" : "use as string",
@@ -25,7 +30,7 @@ module Eventbrite =
       ]}
     """
 
-    type EventsJson = JsonProvider<eventsSample, RootName="Root">
+    type EventsJson = JsonProvider<eventsSample, RootName="root">
 
     type EbEventsJson = JsonProvider<""" {"pagination": {"object_count": 32, "page_number": 1, "page_size": 50, "page_count": 1}, 
                                                 "events": [{"name": {"text": "T vs B", "html": "T vs B"}, 
@@ -71,6 +76,7 @@ module Eventbrite =
           use s = resp.GetResponseStream ()
           let result = EbEventsJson.Load s
           let events = result.Events |> Array.filter (fun e -> e.Status <> "draft" ) |> Array.map createEvent
+          let config = EventsJson.Config(isSummer=false, isWinter=false)
       
-          return! OK (EventsJson.Root(events = events).JsonValue.ToString()) x
+          return! OK (EventsJson.Root(config=config, events=events).JsonValue.ToString()) x
       })

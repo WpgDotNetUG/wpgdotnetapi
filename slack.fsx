@@ -8,33 +8,35 @@ open Suave
 open Suave.ServerErrors
 open Suave.Successful 
 
-let inline (|??) a b = match a with  // for pulling values out of non f# code.. that might be null
-                        | null -> b
-                        | _ -> a
+module Option =
+  let ofNull = function null -> None | var -> Some var
+
+module Env =
+  let getVar = Environment.GetEnvironmentVariable >> Option.ofNull
 
 module Slack = 
 
     type SlackMessage = JsonProvider<""" { "ok":"false", "error":"not authorized" } """>
 
     let asyncError (ctx:HttpContext) (msg:string) = 
-        async{
-            let formattedMessage = sprintf """{"errorMessage":"%s"}""" msg
-            printfn "error => %s" formattedMessage
-            return! INTERNAL_ERROR formattedMessage ctx
-        }
+      async{
+        let formattedMessage = sprintf """{"ok": "false", "error":"%s"}""" msg
+        printfn "error => %s" formattedMessage
+        return! INTERNAL_ERROR formattedMessage ctx
+      }
 
-    let invite (ctx : HttpContext) email   =
-        async {
-            let org = (Environment.GetEnvironmentVariable("SLACK_ORG")) |?? "wpgdotnet" // don't die if environment variable not set
-            let token =  Environment.GetEnvironmentVariable("SLACK_TOKEN") 
-            let url = sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org (DateTime.Now.ToString("yyyyMMddhhmmss"))
-            let! apiResponse = Http.AsyncRequestString(url, body = FormValues ["email", email; "token", token])
-            let slackResponse = SlackMessage.Parse(apiResponse)
-            match slackResponse.Ok with 
-            | false -> return! (asyncError ctx slackResponse.Error)
-            | true ->return! OK (apiResponse) ctx
-        }
+    let org   = "SLACK_ORG"   |> Env.getVar |> FSharpx.Option.getOrElse "wpgdotnet" // don't die if environment variable not set
+    let token = "SLACK_TOKEN" |> Env.getVar |> Option.get
+    let url   = sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org 
+
+    let invite (ctx : HttpContext) email =
+      async {
+        let timeStamp = DateTime.Now.ToString("yyyyMMddhhmmss")
+        let! apiResponse = Http.AsyncRequestString(url timeStamp, body = FormValues ["email", email; "token", token])
+        let slackResponse = SlackMessage.Parse(apiResponse)
+        return! OK apiResponse ctx
+      }
 
     let signUp (ctx:HttpContext) = 
-        ctx.request.formData "email" 
-        |> FSharpx.Choice.choice (invite ctx) (fun i -> asyncError ctx "Missing email")
+      ctx.request.formData "email" 
+      |> FSharpx.Choice.choice (invite ctx) (fun i -> asyncError ctx "Missing email")

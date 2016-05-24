@@ -70,13 +70,21 @@ module Eventbrite =
           logo = (e.Logo |> Option.map (fun l -> l.Url) |> FSharpx.Option.getOrElse ""), 
           venue = EventsJson.Venue(name=e.Venue.Name,address=e.Venue.Address.Address1,id=e.Venue.Id))
 
+      let today = DateTime.Today
+      let curYear = today.Year
+      let endOfJune = new DateTime(curYear, 06, 30)
+      let begOfSep  = new DateTime(curYear, 08, 31)
+
       async {
           let wr = createEbReq "https://www.eventbriteapi.com/v3/users/me/owned_events/?order_by=start_desc&expand=venue"
           let! resp = wr.AsyncGetResponse ()
           use s = resp.GetResponseStream ()
           let result = EbEventsJson.Load s
           let events = result.Events |> Array.filter (fun e -> e.Status <> "draft" ) |> Array.map createEvent
-          let config = EventsJson.Config(isSummer=false, isWinter=false)
+          let config = EventsJson.Config(
+            isSummer=(today >= endOfJune && today <= begOfSep)
+            , isWinter=(today.Month = 12)
+            )
       
           return! OK (EventsJson.Root(config=config, events=events).JsonValue.ToString()) x
       })

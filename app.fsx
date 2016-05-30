@@ -10,6 +10,7 @@
 #load "twitter.fsx"
 #load "slack.fsx"
 
+open Common
 open System
 open System.Text
 open Suave                 // always open suave

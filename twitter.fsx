@@ -7,6 +7,8 @@
 #r "FSharp.Data.dll"
 #load "common.fsx"
 
+open Common
+
 module Twitter = 
 
   open System
@@ -15,8 +17,8 @@ module Twitter =
   open FSharp.Data.Toolbox.Twitter
   open FSharp.Data
 
-  let key = "TWITTER_CONSUMER_KEY" |> Env.tryGetVar |> Option.get
-  let secret = "TWITTER_CONSUMER_SECRET" |> Env.tryGetVar |> Option.get
+  let key    = "TWITTER_CONSUMER_KEY"    |> Env.getVar
+  let secret = "TWITTER_CONSUMER_SECRET" |> Env.getVar
 
   let [<Literal>] twitterSample = """
     {
@@ -81,6 +83,6 @@ module Twitter =
 
       let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Id, mapUser t.User, t.CreatedAt, t.Text, mapEntity t.Entities))
 
-      return! OK (TwitterData.Root(tweets).JsonValue.ToString()) ctxt
+      return! TwitterData.Root(tweets) |> jsonStr |> flip OK ctxt
     }
 

@@ -22,8 +22,9 @@ module Twitter =
       "tweets": [ {
           "user": {
               "id": "some_id",
+              "name": "User Name",
+              "screen_name": "@username",
               "url": "http://some-cool-site.com",
-              "screen_name": "some name",
               "profile_image_url": "http://some-cool-site.com/someones-face.jpg"
           },
           "created_at": "Tue Oct 30 13:22:33 +0000 2012",
@@ -59,10 +60,11 @@ module Twitter =
 
   let mapUser (u:User) =
     UserData(
-        u.Id.ToString(),
-        u.ScreenName,
-        u.Url.Value,
-        u.ProfileImageUrl )
+      u.Id.ToString(),
+      u.Name,
+      u.ScreenName,
+      u.Url.Value,
+      u.ProfileImageUrl)
 
   let mapEntity (e:Entity) =
     EntityData(

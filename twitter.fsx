@@ -20,6 +20,7 @@ module Twitter =
   let [<Literal>] twitterSample = """
     {
       "tweets": [ {
+          "id": 263269086455275520,
           "user": {
               "id": "some_id",
               "name": "User Name",
@@ -77,7 +78,7 @@ module Twitter =
       let twitter = Twitter.AuthenticateAppOnly(key, secret)
       let home = twitter.Timelines.Timeline("wpgnetug", 10)
 
-      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(mapUser t.User, t.CreatedAt, t.Text, mapEntity t.Entities))
+      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Id, mapUser t.User, t.CreatedAt, t.Text, mapEntity t.Entities))
 
       return! OK (TwitterData.Root(tweets).JsonValue.ToString()) ctxt
     }

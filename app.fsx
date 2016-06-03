@@ -52,23 +52,21 @@ printfn "starting web server..."
 let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
 type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
-let imgPath = sprintf "https://s3.amazonaws.com/dotnetug/images/%s/%s"
+let imgPath = sprintf "http://images.winnipegdotnet.org/%s/%s"
 
 let sponsorsText = 
   let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath "sponsors" l, url=u)
   let sponsors =
-    [
-      ("Apptius"  , "Apptius-Logo.png", "http://apptius.com") 
-      ("Imaginet" , "imaginet.png"    , "http://imaginet.com") 
-      ("iQmetrix" , "iqmetrix-logo.png", "http://www.iqmetrix.com") 
-      ("Vision Critical", "vc_logo.png", "http://www.visioncritical.com/")
-      ("Microsoft", "MSFT.png", "http://blogs.msdn.com/b/cdndevs/")
-      ("JetBrains", "jetbrains_logo.png", "http://www.jetbrains.com")
-    ]
-    |> List.map mkSponsor
-    |> Array.ofList
+    [|
+      ("Apptius"        , "Apptius-Logo.png"  , "http://apptius.com") 
+      ("Imaginet"       , "imaginet.png"      , "http://imaginet.com") 
+      ("iQmetrix"       , "iqmetrix-logo.png" , "http://www.iqmetrix.com") 
+      ("Vision Critical", "vc_logo.jpg"       , "http://www.visioncritical.com/")
+      ("Microsoft"      , "MSFT.png"          , "http://blogs.msdn.com/b/cdndevs/")
+    |]
+    |> Array.map mkSponsor
 
-  SponsorsJson.Root( sponsors=sponsors).JsonValue.ToString()
+  SponsorsJson.Root(sponsors).JsonValue.ToString()
 
 let [<Literal>] boardSample = """ { "board": [{"name":"John Doe", "role":"Important Role", "imgUrl":"http://someimage.com", "contact": "Inquiries"}] } """
 type BoardJson = JsonProvider<boardSample, RootName="Root">

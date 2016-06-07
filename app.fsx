@@ -4,6 +4,7 @@
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
+#load "common.fsx"
 #load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"

@@ -5,6 +5,7 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 #r "FSharp.Data.Toolbox.Twitter.dll"
 #r "FSharp.Data.dll"
+#load "common.fsx"
 
 module Twitter = 
 
@@ -14,8 +15,8 @@ module Twitter =
   open FSharp.Data.Toolbox.Twitter
   open FSharp.Data
 
-  let key = Environment.GetEnvironmentVariable("TWITTER_CONSUMER_KEY")
-  let secret = Environment.GetEnvironmentVariable("TWITTER_CONSUMER_SECRET")
+  let key = "TWITTER_CONSUMER_KEY" |> Env.tryGetVar |> Option.get
+  let secret = "TWITTER_CONSUMER_SECRET" |> Env.tryGetVar |> Option.get
 
   let [<Literal>] twitterSample = """
     {

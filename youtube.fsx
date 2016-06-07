@@ -1,5 +1,6 @@
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+#load "common.fsx"
 
 module Youtube = 
 
@@ -46,7 +47,7 @@ module Youtube =
 
   let getVideos x = 
     let query () =
-      let api_token = Environment.GetEnvironmentVariable("YOUTUBE_API_TOKEN")
+      let api_token = "YOUTUBE_API_TOKEN" |> Env.tryGetVar |> Option.get
       let channel = "UC6OzdI6-htXE_97zamJRaaA"
       let url = sprintf "https://www.googleapis.com/youtube/v3/search?key=%s&channelId=%s&part=snippet,id&order=date&maxResults=10" api_token channel 
       YouTubeData.Load(url)

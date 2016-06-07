@@ -1,18 +1,13 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/FSharpx.Extras/lib/40/FSharpx.Extras.dll"
+#load "common.fsx"
 
 open System
 open FSharp.Data
 open Suave
 open Suave.ServerErrors
 open Suave.Successful 
-
-module Option =
-  let ofNull = function null -> None | var -> Some var
-
-module Env =
-  let getVar = Environment.GetEnvironmentVariable >> Option.ofNull
 
 module Slack = 
 
@@ -25,8 +20,8 @@ module Slack =
         return! INTERNAL_ERROR formattedMessage ctx
       }
 
-    let org   = "SLACK_ORG"   |> Env.getVar |> FSharpx.Option.getOrElse "wpgdotnet" // don't die if environment variable not set
-    let token = "SLACK_TOKEN" |> Env.getVar |> Option.get
+    let org   = "SLACK_ORG"   |> Env.tryGetVar |> FSharpx.Option.getOrElse "wpgdotnet" // don't die if environment variable not set
+    let token = "SLACK_TOKEN" |> Env.tryGetVar |> Option.get
     let url   = sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org 
 
     let invite (ctx : HttpContext) email =

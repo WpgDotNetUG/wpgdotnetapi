@@ -2,8 +2,9 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 #r "packages/FSharpX.Extras/lib/40/FSharpx.Extras.dll"
 #r "packages/FSharpX.Collections/lib/net40/FSharpx.Collections.dll"
+#load "common.fsx"
 
-module Eventbrite = 
+module Eventbrite =
 
     open System
     open System.Net
@@ -54,7 +55,7 @@ module Eventbrite =
 
     let getEvents = (fun x -> 
       let createEbReq (url : string) = 
-          let auth = Environment.GetEnvironmentVariable("EB_AUTH_TOKEN") |> sprintf "Bearer %s"
+          let auth = "EB_AUTH_TOKEN" |> Env.tryGetVar |> Option.get |> sprintf "Bearer %s"
           let wr = HttpWebRequest.Create(url)
           wr.Headers.Add("Authorization", auth)
           wr

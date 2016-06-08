@@ -3,7 +3,7 @@
 #load "common.fsx"
 
 module Youtube = 
-
+  open Common
   open System
   open System.Net
   open Suave.Successful

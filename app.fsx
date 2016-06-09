@@ -85,7 +85,7 @@ let boardText =
 
   BoardJson.Root(board=members).JsonValue.ToString()
 
-let jsonMime = setMimeType "application/json" >=> setHeader  "Access-Control-Allow-Origin" "*"
+let jsonMime = setMimeType "application/json; charset=utf-8" >=> setHeader  "Access-Control-Allow-Origin" "*"
 
 let app =
   choose

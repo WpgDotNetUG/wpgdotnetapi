@@ -16,6 +16,7 @@ module Twitter =
   open Suave.Successful
   open FSharp.Data.Toolbox.Twitter
   open FSharp.Data
+  open System.Globalization
 
   let key    = "TWITTER_CONSUMER_KEY"    |> Env.getVar
   let secret = "TWITTER_CONSUMER_SECRET" |> Env.getVar
@@ -31,7 +32,7 @@ module Twitter =
               "url": "http://some-cool-site.com",
               "profile_image_url": "http://some-cool-site.com/someones-face.jpg"
           },
-          "created_at": "Tue Oct 30 13:22:33 +0000 2012",
+          "created_at":"2011-01-01T17:00:00",
           "text": "some kind",
           "entity": {
               "hashtags": [ {
@@ -40,7 +41,7 @@ module Twitter =
               "urls": [ {
                   "url": "http://t.co/funUrl",
                   "expanded_url": "http://www.actual-domain.com/?some=query&stuff=123",
-                  "display_url": "actual-domain.com/?some=…",
+                  "display_url": "actual-domain.com/?some=query",
                   "indices": [10, 20] } ],
               "user_mentions": [ {
                   "screen_name": "wpgnetug",
@@ -76,12 +77,16 @@ module Twitter =
         e.Urls          |> Array.map (fun u -> UrlData     (u.Url, u.ExpandedUrl, u.DisplayUrl, u.Indices)),
         e.UserMentions  |> Array.map (fun m -> MentionData (m.ScreenName, m.Name, m.Id.ToString(), m.Indices)) )
 
+  let parseDate (strDate: string)  =
+    let format = "ddd MMM dd HH:mm:ss zzzz yyyy"
+    DateTime.ParseExact(strDate, format, CultureInfo.InvariantCulture)
+
   let getTweets ctxt =
     async {
       let twitter = Twitter.AuthenticateAppOnly(key, secret)
       let home = twitter.Timelines.Timeline("wpgnetug", 10)
 
-      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Id, mapUser t.User, t.CreatedAt, t.Text, mapEntity t.Entities))
+      let tweets = home |> Array.map (fun t -> TwitterData.Tweet(t.Id, mapUser t.User, parseDate t.CreatedAt, t.Text, mapEntity t.Entities))
 
       return! TwitterData.Root(tweets) |> jsonStr |> flip OK ctxt
     }

@@ -77,9 +77,9 @@ let boardText =
   let mkMember (n, r, i, c) = BoardJson.Board(name=n, role=r, imgUrl=imgPath "board" i, contact=c)
   let members = 
     [|
-      ("Amir Barylko", "President"     , "amir.jpg" , "General Inquiries")
-      ("Roy Drenker" , "Treasurer"     , "roy.jpg"  , "Sponsorship")
-      ("David Wesst" , "Event Planning", "david.jpg", "Events")
+      ("David Wesst" , "President/Event Coordinator", "david.jpg", "Events")
+      ("Roy Drenker" , "Treasurer", "roy.jpg", "Sponsorship")
+      //("Shane Charles", "Source Wrangler", "shane.jpg", "Source")
     |]
     |> Array.map mkMember
 

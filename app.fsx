@@ -79,7 +79,7 @@ let boardText =
     [|
       ("David Wesst" , "President/Event Coordinator", "david.jpg", "Events")
       ("Roy Drenker" , "Treasurer", "roy.jpg", "Sponsorship")
-      //("Shane Charles", "Source Wrangler", "shane.jpg", "Source")
+      ("Shane Charles", "Source Wrangler", "shane.jpg", "Source")
     |]
     |> Array.map mkMember
 

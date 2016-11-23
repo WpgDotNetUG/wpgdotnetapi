@@ -87,7 +87,7 @@ module Eventbrite =
       use stream = resp.GetResponseStream ()
       let published = EbEventsJson.Load(stream).Events |> Array.filter onlyPublished |> Array.map createEvent
       let lastEvent = published |> Array.head |> eventDate 
-      let alreadyHappened  = lastEvent < DateTime.Now 
+      let alreadyHappened  = lastEvent.Date < DateTime.Now.Date 
 
       let isSummer = Season.isSummer DateTime.Now || (alreadyHappened && Season.isBeforeSummer lastEvent)
 

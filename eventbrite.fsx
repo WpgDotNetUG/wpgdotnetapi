@@ -65,8 +65,8 @@ module Eventbrite =
     EventsJson.Event(
       title   = e.Name.Text, 
       status  = e.Status,
-      date    = e.Start.Local,
-      enddate = e.End.Local,
+      date    = e.Start.Utc,
+      enddate = e.End.Utc,
       id      = e.Id,
       link    = e.Url,
       logo    = (e.Logo |> Option.map (fun l -> l.Url) |> FSharpx.Option.getOrElse ""), 
@@ -86,12 +86,13 @@ module Eventbrite =
       let! resp = wr.AsyncGetResponse ()
       use stream = resp.GetResponseStream ()
       let published = EbEventsJson.Load(stream).Events |> Array.filter onlyPublished |> Array.map createEvent
-      let lastEvent = published |> Array.head |> eventDate 
-      let alreadyHappened  = lastEvent.Date < DateTime.Now.Date 
+      let lastEvent = published |> Array.head |> eventDate
+      let now = DateTime.UtcNow 
+      let alreadyHappened  = lastEvent < now 
 
-      let isSummer = Season.isSummer DateTime.Now || (alreadyHappened && Season.isBeforeSummer lastEvent)
+      let isSummer = Season.isSummer now || (alreadyHappened && Season.isBeforeSummer lastEvent)
 
-      let isWinter = Season.isWinter DateTime.Now || (alreadyHappened && Season.isBeforeWinter lastEvent)
+      let isWinter = Season.isWinter now || (alreadyHappened && Season.isBeforeWinter lastEvent)
 
       let config = EventsJson.Config(isSummer = isSummer, isWinter = isWinter)
 

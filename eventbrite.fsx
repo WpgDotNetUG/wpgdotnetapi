@@ -92,7 +92,7 @@ module Eventbrite =
 
       let isSummer = Season.isSummer now || (alreadyHappened && Season.isBeforeSummer lastEvent)
 
-      let isWinter = Season.isWinter now || (alreadyHappened && Season.isBeforeWinter lastEvent)
+      let isWinter = Season.isWinter now && alreadyHappened
 
       let config = EventsJson.Config(isSummer = isSummer, isWinter = isWinter)
 

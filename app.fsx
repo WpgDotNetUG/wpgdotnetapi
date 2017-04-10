@@ -60,11 +60,12 @@ let sponsorsText =
   let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath "sponsors" l, url=u)
   let sponsors =
     [|
-      ("Apptius"        , "Apptius-Logo.png"  , "http://apptius.com") 
-      ("Imaginet"       , "imaginet.png"      , "http://imaginet.com") 
-      ("iQmetrix"       , "iqmetrix-logo.png" , "http://www.iqmetrix.com") 
-      ("Vision Critical", "vc_logo.jpg"       , "http://www.visioncritical.com/")
-      ("Microsoft"      , "MSFT.png"          , "http://blogs.msdn.com/b/cdndevs/")
+      ("Apptius"        , "Apptius-Logo.png"              , "http://apptius.com") 
+      ("Imaginet"       , "imaginet.png"                  , "http://imaginet.com") 
+      ("iQmetrix"       , "iqmetrix-logo.png"             , "http://www.iqmetrix.com") 
+      ("Vision Critical", "vc_logo.jpg"                   , "http://www.visioncritical.com/")
+      ("Microsoft"      , "MSFT.png"                      , "http://blogs.msdn.com/b/cdndevs/")
+      ("uniPoint"       , "uniPoint-DotNet-User-Group.png", "https://www.unipointsoftware.com/")
     |]
     |> Array.map mkSponsor
 

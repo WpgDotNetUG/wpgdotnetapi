@@ -2,6 +2,7 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 #r "packages/FSharpX.Extras/lib/40/FSharpx.Extras.dll"
 #r "packages/FSharpX.Collections/lib/net40/FSharpx.Collections.dll"
+#r "System.Net.Http.dll"
 
 #load "common.fsx"
 
@@ -11,7 +12,10 @@ module Eventbrite =
   open System.Net
   open Suave.Successful
   open FSharp.Data
-  open FSharp
+  open System.Net.Http
+
+  let httpClient = new HttpClient() 
+  System.Net.ServicePointManager.SecurityProtocol <- SecurityProtocolType.Tls12
 
   let [<Literal>] eventsSample = """
     { 
@@ -55,12 +59,6 @@ module Eventbrite =
                                                           "logo": null,
                                                           "venue": {"address": {"address_1": "asdf"}, "id": "stringify", "name": "Millenium Library   Buchwald Room, 2nd floor"}}]} """>
 
-  let createEbReq (url : string) = 
-    let auth = "EB_AUTH_TOKEN" |> Env.getVar |> sprintf "Bearer %s"
-    let wr = HttpWebRequest.Create(url)
-    wr.Headers.Add("Authorization", auth)
-    wr
-
   let createEvent (e : EbEventsJson.Event) = 
     EventsJson.Event(
       title   = e.Name.Text, 
@@ -82,10 +80,12 @@ module Eventbrite =
       d1.Month = target.Month && d1.Year = target.Year
 
     async {
-      let wr = createEbReq "https://www.eventbriteapi.com/v3/users/me/owned_events/?order_by=start_desc&expand=venue"
-      let! resp = wr.AsyncGetResponse ()
-      use stream = resp.GetResponseStream ()
-      let published = EbEventsJson.Load(stream).Events |> Array.filter onlyPublished |> Array.map createEvent
+      httpClient.DefaultRequestHeaders.Authorization <- new Headers.AuthenticationHeaderValue("Bearer", "EB_AUTH_TOKEN" |> Env.getVar)
+      let! resp = httpClient.GetAsync("https://www.eventbriteapi.com/v3/users/me/owned_events/?order_by=start_desc&expand=venue")
+                    |> Async.AwaitTask
+      let! contents = resp.Content.ReadAsStringAsync () |> Async.AwaitTask 
+      httpClient.DefaultRequestHeaders.Authorization <- null
+      let published = EbEventsJson.Parse(contents).Events |> Array.filter onlyPublished |> Array.map createEvent
       let lastEvent = published |> Array.head |> eventDate
       let now = DateTime.UtcNow 
       let alreadyHappened  = lastEvent < now 

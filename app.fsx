@@ -104,4 +104,3 @@ let app =
                   Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]
 
       POST >=> path "/api/slack"              >=> jsonMime >=> Slack.signUp ]
-    

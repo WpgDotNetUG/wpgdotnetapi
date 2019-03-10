@@ -9,6 +9,7 @@
 #load "youtube.fsx"
 #load "twitter.fsx"
 #load "slack.fsx"
+#load "meetup.fsx"
 
 open Common
 open System
@@ -22,7 +23,7 @@ open Suave.Successful // for OK-result
 open Suave.Operators 
 open Suave.Writers 
 open FSharp.Data
-open Eventbrite
+open Meetup
 open Youtube
 open Twitter
 open Slack
@@ -96,8 +97,8 @@ let app =
                   path "/api/sponsors/sample" >=> jsonMime >=> OK sponsorSample
                   path "/api/board"           >=> jsonMime >=> OK boardText
                   path "/api/board/sample"    >=> jsonMime >=> OK boardSample
-                  path "/api/events"          >=> jsonMime >=> Eventbrite.getEvents
-                  path "/api/events/sample"   >=> jsonMime >=> OK Eventbrite.eventsSample
+                  path "/api/events"          >=> jsonMime >=> Meetup.getEvents
+                  path "/api/events/sample"   >=> jsonMime >=> OK Meetup.eventsSample
                   path "/api/videos"          >=> jsonMime >=> Youtube.getVideos
                   path "/api/tweets"          >=> jsonMime >=> Twitter.getTweets
                   path "/goodbye" >=> OK "Good bye GET" 

@@ -23,14 +23,15 @@ module Slack =
         return! INTERNAL_ERROR formattedMessage ctx
       }
 
-    let org   = "SLACK_ORG"   |> Env.tryGetVar |> FSharpx.Option.getOrElse "wpgdotnet" // don't die if environment variable not set
-    let token = "SLACK_TOKEN" |> Env.getVar
-    let url   = sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org 
+    let getSlackUrl = 
+      let org   = "SLACK_ORG"   |> Env.tryGetVar |> FSharpx.Option.getOrElse "wpgdotnet" // don't die if environment variable not set
+      sprintf "https://%s.slack.com/api/users.admin.invite?t=%O" org 
 
     let invite (ctx : HttpContext) email =
       async {
         let timeStamp = DateTime.Now.ToString("yyyyMMddhhmmss")
-        let! apiResponse = Http.AsyncRequestString(url timeStamp, body = FormValues ["email", email; "token", token])
+        let token = "SLACK_TOKEN" |> Env.getVar
+        let! apiResponse = Http.AsyncRequestString(getSlackUrl timeStamp, body = FormValues ["email", email; "token", token])
         let slackResponse = SlackMessage.Parse(apiResponse)
         return! OK apiResponse ctx
       }

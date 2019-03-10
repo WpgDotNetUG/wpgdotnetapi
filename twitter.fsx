@@ -18,8 +18,8 @@ module Twitter =
   open FSharp.Data
   open System.Globalization
 
-  let key    = "TWITTER_CONSUMER_KEY"    |> Env.getVar
-  let secret = "TWITTER_CONSUMER_SECRET" |> Env.getVar
+  let getKey ()    = "TWITTER_CONSUMER_KEY"    |> Env.getVar
+  let getSecret () = "TWITTER_CONSUMER_SECRET" |> Env.getVar
 
   let [<Literal>] twitterSample = """
     {
@@ -83,6 +83,8 @@ module Twitter =
 
   let getTweets ctxt =
     async {
+      let key = getKey ()
+      let secret = getSecret ()
       let twitter = Twitter.AuthenticateAppOnly(key, secret)
       let home = twitter.Timelines.Timeline("wpgnetug", 10)
 

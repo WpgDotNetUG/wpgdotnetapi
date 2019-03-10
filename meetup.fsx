@@ -99,7 +99,6 @@ module Meetup =
       let published = MeetupJson.Parse(contents).Results 
                       |> Array.filter onlyPublished 
                       |> Array.map createEvent
-                      |> Array.sortBy (fun e -> e.Date)
       let lastEvent = published |> Array.head |> eventDate
       let now = DateTime.UtcNow 
       let alreadyHappened  = lastEvent < now 

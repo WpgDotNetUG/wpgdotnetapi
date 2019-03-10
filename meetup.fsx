@@ -74,7 +74,7 @@ module Meetup =
       enddate = epoch.AddMilliseconds (float (e.Time + (int64 e.Duration))),
       id      = e.Id,
       link    = e.EventUrl,
-      logo    = "",
+      logo    = "https://meetup.com/mu_static/en-US/group_fallback_large_2.d2eedbb1.png",
       description = e.Description,
       venue = EventsJson.Venue(name=e.Venue.Name,address=e.Venue.Address1,id=string e.Venue.Id))
 

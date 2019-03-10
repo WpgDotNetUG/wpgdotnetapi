@@ -66,12 +66,12 @@ module Meetup =
 
 
   let createEvent (e : MeetupJson.Result) = 
-    let epoch = DateTime (1970,1,1)
+    let epoch = DateTimeOffset (1970,1,1, 0,0,0,0,TimeSpan.Zero)
     EventsJson.Event(
       title   = e.Name, 
       status  = e.Status,
-      date    = epoch.AddMilliseconds (float e.Time),
-      enddate = epoch.AddMilliseconds (float (e.Time + (int64 e.Duration))),
+      date    = (epoch.AddMilliseconds (float e.Time)).UtcDateTime,
+      enddate = (epoch.AddMilliseconds (float (e.Time + (int64 e.Duration)))).UtcDateTime,
       id      = e.Id,
       link    = e.EventUrl,
       logo    = "https://meetup.com/mu_static/en-US/group_fallback_large_2.d2eedbb1.png",

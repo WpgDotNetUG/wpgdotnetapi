@@ -5,7 +5,6 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 #load "common.fsx"
-#load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"
 #load "slack.fsx"

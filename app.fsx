@@ -5,7 +5,6 @@
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 #load "common.fsx"
-#load "eventbrite.fsx"
 #load "youtube.fsx"
 #load "twitter.fsx"
 #load "slack.fsx"
@@ -105,4 +104,3 @@ let app =
                   Writers.setMimeType "text/plain" >=> RequestErrors.NOT_FOUND "Resource not found."]
 
       POST >=> path "/api/slack"              >=> jsonMime >=> Slack.signUp ]
-    

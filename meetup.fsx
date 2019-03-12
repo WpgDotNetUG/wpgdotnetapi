@@ -1,9 +1,4 @@
-﻿<<<<<<< HEAD
 ﻿#r "packages/Suave/lib/net40/Suave.dll"
-=======
-﻿open FSharpx
-#r "packages/Suave/lib/net40/Suave.dll"
->>>>>>> master
 #r "packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 #r "packages/FSharpX.Extras/lib/40/FSharpx.Extras.dll"
 #r "packages/FSharpX.Collections/lib/net40/FSharpx.Collections.dll"

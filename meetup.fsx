@@ -38,6 +38,11 @@ module Meetup =
       }
     ]}
   """
+  type FeaturedPhoto () =
+    let mutable link = ""
+    member x.Photo_Link 
+      with get() = link
+      and set(v) = link <- v
 
   type Venue () = 
     let mutable _id = ""
@@ -60,7 +65,7 @@ module Meetup =
     let mutable status = ""
     let mutable _id = ""
     let mutable link = ""
-    let mutable logo = ""
+    let mutable photo = FeaturedPhoto ()
     let mutable description = ""
     let mutable duration = 0
 
@@ -85,10 +90,10 @@ module Meetup =
     member x.Link 
       with get() = link
       and set(v) = link <- v
-    member x.PhotoUrl
-      with get() = logo
-      and set(v) = logo <- v
-    member x.Description
+    member x.Featured_Photo
+      with get() = photo
+      and set(v) = photo <- v
+    member x.Plain_Text_Description
       with get() = description
       and set(v) = description <- v
 
@@ -96,8 +101,8 @@ module Meetup =
 
   let createEvent (e : Meetup) = 
     let epoch = DateTimeOffset (1970,1,1, 0,0,0,0,TimeSpan.Zero)
-    let logo = if e.PhotoUrl = "" then "https://meetup.com/mu_static/en-US/group_fallback_large_2.d2eedbb1.png" 
-               else e.PhotoUrl
+    let logo = if e.Featured_Photo.Photo_Link = "" then "https://meetup.com/mu_static/en-US/group_fallback_large_2.d2eedbb1.png" 
+               else e.Featured_Photo.Photo_Link
     EventsJson.Event(
       title   = e.Name, 
       status  = e.Status,
@@ -106,7 +111,7 @@ module Meetup =
       id      = e.Id,
       link    = e.Link,
       logo    = logo,
-      description = e.Description,
+      description = e.Plain_Text_Description,
       venue = EventsJson.Venue(name=e.Venue.Name,address=e.Venue.Address1,id=string e.Venue.Id))
 
   let getEvents ctx =
@@ -119,7 +124,7 @@ module Meetup =
 
     async {
       //let url = sprintf "https://api.meetup.com/2/events?offset=0&format=json&limited_events=False&group_urlname=fullstackmb&photo-host=public&page=20&fields=&order=time&desc=false&status=upcoming&sig_id=%s&sig=%s" key sec
-      let url = "https://api.meetup.com/fullstackmb/events?&sign=true&photo-host=public&page=5"
+      let url = "https://api.meetup.com/fullstackmb/events?&sign=true&photo-host=public&page=5&fields=plain_text_description,featured_photo"
       let! resp = httpClient.GetAsync url
                     |> Async.AwaitTask
       let! contents = resp.Content.ReadAsStringAsync () |> Async.AwaitTask 

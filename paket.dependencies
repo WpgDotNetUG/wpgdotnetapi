@@ -6,3 +6,4 @@ nuget FSharp.Data
 nuget FSharp.Compiler.Service
 nuget FSharpX.Extras
 nuget FSharp.Data.Toolbox.Twitter
+nuget Newtonsoft.json

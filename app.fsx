@@ -54,7 +54,7 @@ printfn "starting web server..."
 let [<Literal>] sponsorSample = """ { "sponsors": [{"name":"Great Sponsor", "url": "http://somesite.com", "imgUrl": "http://someurl.com/image1"}] } """
 type SponsorsJson = JsonProvider<sponsorSample, RootName="Root">
 
-let imgPath = sprintf "http://images.winnipegdotnet.org/%s/%s"
+let imgPath = sprintf "https://fsmb.s3.ca-central-1.amazonaws.com/%s/%s"
 
 let sponsorsText = 
   let mkSponsor (n, l, u) = SponsorsJson.Sponsor(name=n, imgUrl=imgPath "sponsors" l, url=u)

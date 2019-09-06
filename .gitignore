@@ -2,3 +2,4 @@ packages/
 paket.exe
 .fake
 paket-files/
+.ionide/

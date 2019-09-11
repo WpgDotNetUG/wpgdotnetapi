@@ -63,13 +63,18 @@ module Twitter =
   type Entity      = TwitterTypes.TimeLine.Entities4
   type User        = TwitterTypes.TimeLine.User
 
+  let toTls (url : string) : string = 
+    if not <| String.IsNullOrWhiteSpace url
+    then url.Replace("http:", "https:")
+    else ""
+
   let mapUser (u:User) =
     UserData(
       u.Id.ToString(),
       u.Name,
       u.ScreenName,
-      u.Url.Value,
-      u.ProfileImageUrl)
+      u.Url.Value |> toTls,
+      u.ProfileImageUrl |> toTls)
 
   let mapEntity (e:Entity) =
     EntityData(
